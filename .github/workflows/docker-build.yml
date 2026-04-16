@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get WhisperX version
+      - name: Get WhisperX tag
         id: whisperx-version
         run: |
-          version=$(grep WHISPERX_VERSION .whisperx-version | cut -d= -f2)
+          version=$(grep WHISPERX_TAG .whisperx-version | cut -d= -f2)
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
@@ -41,7 +41,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix={{branch}}-
-            type=raw,value=whisperx-${{ steps.whisperx-version.outputs.version }},enable={{is_default_branch}}
+            type=raw,value=base-${{ steps.whisperx-version.outputs.version }},enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
@@ -51,6 +51,6 @@ jobs:
           push: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: WHISPERX_VERSION=${{ steps.whisperx-version.outputs.version }}
+          build-args: WHISPERX_TAG=${{ steps.whisperx-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

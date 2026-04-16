@@ -1,11 +1,10 @@
-ARG WHISPERX_VERSION=3.1.0
+ARG WHISPERX_TAG=no_model
 
-FROM ghcr.io/jim60105/whisperx:${WHISPERX_VERSION}
+FROM ghcr.io/jim60105/whisperx:${WHISPERX_TAG}
 
 ENV UV_SYSTEM_PYTHON=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    WHISPERX_VERSION=${WHISPERX_VERSION}
+    PYTHONUNBUFFERED=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ffmpeg \
