@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import io
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app import app, require_auth, AuthError
+from app import AuthError, app, require_auth
 
 
 @pytest.fixture
