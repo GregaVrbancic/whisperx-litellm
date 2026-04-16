@@ -1,0 +1,11 @@
+model_list:
+  - model_name: whisperx-local
+    litellm_params:
+      model: openai/large-v3
+      api_base: http://whisperx-api:8010/v1
+      api_key: os.environ/WHISPERX_API_KEY
+      timeout: 600
+    model_info:
+      mode: audio_transcription
+      description: "Local WhisperX transcription and diarization"
+      supports_audio_transcription: true

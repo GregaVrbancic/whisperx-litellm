@@ -1,0 +1,29 @@
+services:
+  whisperx-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: whisperx-api:local
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+      WHISPERX_API_KEY: ${WHISPERX_API_KEY:-}
+      WHISPERX_MODEL: large-v3
+      WHISPERX_DEVICE: cuda
+      WHISPERX_COMPUTE_TYPE: float16
+      WHISPERX_BATCH_SIZE: 4
+    volumes:
+      - whisperx_cache:/.cache
+      - ./data:/data
+    ports:
+      - "127.0.0.1:8010:8010"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  whisperx_cache:
