@@ -47,12 +47,13 @@ class AuthError(HTTPException):
 
 
 def require_auth(authorization: str | None) -> None:
-    if not API_KEY:
+    api_key = os.getenv("WHISPERX_API_KEY")
+    if not api_key:
         return
     if not authorization or not authorization.startswith("Bearer "):
         raise AuthError()
     token = authorization.split(" ", 1)[1].strip()
-    if token != API_KEY:
+    if token != api_key:
         raise AuthError()
 
 
@@ -84,7 +85,7 @@ def list_models(authorization: str | None = Header(default=None)) -> dict[str, A
     }
 
 
-@app.post("/transcribe")
+@app.post("/transcribe", response_model=None)
 async def transcribe(
     file: UploadFile = File(...),
     authorization: str | None = Header(default=None),
@@ -119,7 +120,7 @@ async def transcribe(
     )
 
 
-@app.post("/v1/audio/transcriptions")
+@app.post("/v1/audio/transcriptions", response_model=None)
 async def openai_audio_transcriptions(
     file: UploadFile = File(...),
     authorization: str | None = Header(default=None),
