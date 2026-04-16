@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 APP_NAME = "WhisperX LiteLLM Wrapper"
 
+
 def get_app_version() -> str:
     """Read version from pyproject.toml."""
     pyproject_path = Path(__file__).parent / "pyproject.toml"
@@ -94,7 +95,9 @@ async def transcribe(
     batch_size: int = Form(default=int(DEFAULT_BATCH_SIZE)),
     compute_type: str = Form(default=DEFAULT_COMPUTE_TYPE),
     device: str = Form(default=DEFAULT_DEVICE),
-    output_format: Literal["json", "txt", "srt", "tsv", "vtt"] = Form(default=DEFAULT_OUTPUT_FORMAT),
+    output_format: Literal["json", "txt", "srt", "tsv", "vtt"] = Form(
+        default=DEFAULT_OUTPUT_FORMAT
+    ),
     min_speakers: int | None = Form(default=None),
     max_speakers: int | None = Form(default=None),
     response_format: Literal["json", "text", "verbose_json"] = Form(default="json"),
@@ -163,7 +166,9 @@ async def _run_whisperx(
     response_format: str,
 ) -> JSONResponse | PlainTextResponse:
     if diarize and not HF_TOKEN:
-        raise HTTPException(status_code=400, detail="HF_TOKEN is required when diarize=true")
+        raise HTTPException(
+            status_code=400, detail="HF_TOKEN is required when diarize=true"
+        )
 
     suffix = Path(file.filename or "upload.bin").suffix or ".bin"
     req_id = uuid.uuid4().hex[:12]
@@ -180,13 +185,20 @@ async def _run_whisperx(
         cmd = [
             WHISPERX_BIN,
             str(input_path),
-            "--model", model,
-            "--output_dir", str(output_dir),
-            "--output_format", output_format,
-            "--compute_type", compute_type,
-            "--device", device,
-            "--batch_size", str(batch_size),
-            "--task", task,
+            "--model",
+            model,
+            "--output_dir",
+            str(output_dir),
+            "--output_format",
+            output_format,
+            "--compute_type",
+            compute_type,
+            "--device",
+            device,
+            "--batch_size",
+            str(batch_size),
+            "--task",
+            task,
         ]
 
         if language:
@@ -216,15 +228,23 @@ async def _run_whisperx(
 
         if response_format == "text":
             if txt_path.exists():
-                return PlainTextResponse(txt_path.read_text(encoding="utf-8", errors="replace"))
+                return PlainTextResponse(
+                    txt_path.read_text(encoding="utf-8", errors="replace")
+                )
             if json_path.exists():
                 payload = json.loads(json_path.read_text(encoding="utf-8"))
-                text = payload.get("text") or "\n".join(seg.get("text", "") for seg in payload.get("segments", []))
+                text = payload.get("text") or "\n".join(
+                    seg.get("text", "") for seg in payload.get("segments", [])
+                )
                 return PlainTextResponse(text)
-            raise HTTPException(status_code=500, detail="WhisperX did not produce expected text output")
+            raise HTTPException(
+                status_code=500, detail="WhisperX did not produce expected text output"
+            )
 
         if not json_path.exists():
-            raise HTTPException(status_code=500, detail="WhisperX did not produce expected JSON output")
+            raise HTTPException(
+                status_code=500, detail="WhisperX did not produce expected JSON output"
+            )
 
         payload = json.loads(json_path.read_text(encoding="utf-8"))
 

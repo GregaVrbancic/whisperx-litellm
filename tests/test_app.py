@@ -121,7 +121,9 @@ class TestTranscribeEndpoint:
     @pytest.mark.unit
     def test_transcribe_returns_error_without_hf_token_when_diarizing(self, client):
         """Transcribe should return 400 when diarize=true but HF_TOKEN is not set."""
-        with patch.dict(os.environ, {"WHISPERX_API_KEY": "", "HF_TOKEN": ""}, clear=False):
+        with patch.dict(
+            os.environ, {"WHISPERX_API_KEY": "", "HF_TOKEN": ""}, clear=False
+        ):
             audio_data = io.BytesIO(b"fake audio data")
             response = client.post(
                 "/transcribe",
@@ -152,6 +154,11 @@ class TestOpenAICompatibleEndpoint:
 def test_app_has_required_endpoints():
     """Verify all required endpoints are defined."""
     endpoints = [route.path for route in app.routes]
-    required_paths = ["/health", "/v1/models", "/transcribe", "/v1/audio/transcriptions"]
+    required_paths = [
+        "/health",
+        "/v1/models",
+        "/transcribe",
+        "/v1/audio/transcriptions",
+    ]
     for path in required_paths:
         assert path in endpoints, f"Missing endpoint: {path}"
